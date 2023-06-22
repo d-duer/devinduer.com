@@ -40,7 +40,7 @@ const cursor = createRef<Mesh>()
 const GROUP_COLLIDE = 2 ** 0
 const GROUP_CURSOR = 2 ** 1
 
-export function Table() {
+/*export function Table() {
   const gltf = useLoader(GLTFLoader,'./assets/woodtable6.glb');
   gltf.scene.traverse(function (child) {
     console.log(child);
@@ -59,7 +59,7 @@ export function Table() {
   return (
       <primitive object={gltf.scene} />
   );
-}
+}*/
 
 // Returns legacy geometry vertices, faces for ConvP
 function toConvexProps(bufferGeometry: BufferGeometry): ConvexPolyhedronProps['args'] {
@@ -75,7 +75,7 @@ type DiamondGLTF = GLTF & {
   materials: {}
 }
 
-function Diamond({ position, rotation }: ConvexPolyhedronProps) {
+/*function Diamond({ position, rotation }: ConvexPolyhedronProps) {
   console.log('hello1')
   //const geometry = new THREE.BufferGeometry()
   const { nodes: { Cylinder: { geometry }, }, } = useLoader(GLTFLoader,'./assets/woodtable6.glb') as DiamondGLTF;
@@ -87,7 +87,7 @@ function Diamond({ position, rotation }: ConvexPolyhedronProps) {
       <meshStandardMaterial wireframe color="white" />
     </mesh>
   )
-}
+}*/
 
 function useDragConstraint(child: RefObject<Object3D>) {
   const [, , api] = usePointToPointConstraint(cursor, child, { pivotA: [0, 0, 0], pivotB: [0, 0, 0], maxForce: 0.7 })
@@ -96,7 +96,6 @@ function useDragConstraint(child: RefObject<Object3D>) {
   const onPointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
     console.log('pointer down')
     e.stopPropagation()
-    //@ts-expect-error Investigate proper types here.
     e.target.setPointerCapture(e.pointerId)
     api.enable()
   }, [])
@@ -245,8 +244,6 @@ function App() {
             {/*<Ball position={[0.1, 5, 0]} />*/}
             <PhyBox position={[0.1, 4, 0]} />
             <Cursor />
-            <Diamond />
-            <Table />
           </Debug>
         </Physics>
       </Canvas>
