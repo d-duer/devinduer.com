@@ -1,4 +1,9 @@
 {
+  "typeAcquisition": {
+    "include": [
+      "three"
+    ]
+  },
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -21,6 +26,10 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
-  ]
+    "src",
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
+    "./src/**/*.js",
+    "./src/**/*.jsx"
+]
 }
