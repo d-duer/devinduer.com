@@ -1,93 +1,65 @@
-import type { BoxProps, PlaneProps, SphereProps, Triplet, ConvexPolyhedronProps } from '@react-three/cannon'
-import { Physics, useBox, useSphere, useSpring, usePlane, Debug, usePointToPointConstraint, useConvexPolyhedron } from '@react-three/cannon'
+import type { BoxProps, PlaneProps, SphereProps, Triplet, ConvexPolyhedronProps, TrimeshProps } from '@react-three/cannon'
+import { Physics, useBox, useSphere, useSpring, usePlane, Debug, usePointToPointConstraint, useConvexPolyhedron, useTrimesh } from '@react-three/cannon'
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import React, { forwardRef, useEffect, useRef, useState, createRef, useCallback, useMemo } from 'react'
 import type { RefObject } from 'react'
-import type { ThreeEvent } from '@react-three/fiber'
+import type { ThreeEvent, MeshStandardMaterialProps, MeshProps, BoxBufferGeometryProps } from '@react-three/fiber'
 import { CameraHelper, Mesh, type Object3D } from 'three'
 import type { BufferGeometry } from 'three'
-import { Box, OrbitControls, PerspectiveCamera, useHelper, useGLTF } from '@react-three/drei'
+import { Box, Sphere, OrbitControls, PerspectiveCamera, useHelper, useGLTF } from '@react-three/drei'
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Geometry } from "three-stdlib/deprecated/Geometry";
 import type { GLTF } from 'three-stdlib/loaders/GLTFLoader'
-
-useGLTF.preload('./assets/woodtable6.glb')
-
-//import { Mesh } from "three";
-
-/*const Box = forwardRef<Mesh, BoxProps>((props, fwdRef) => {
-  const args: Triplet = [1, 1, 1]
-  const [boxref] = useBox(
-    () => ({
-      args,
-      linearDamping: 0.7,
-      mass: 1,
-      ...props,
-    }),
-    fwdRef,
-  )
-  return (
-    <mesh ref={boxref}>
-      <boxGeometry args={args} />
-      <meshNormalMaterial />
-    </mesh>
-  )
-})*/
-
+import { Boundary1, Boundary2, Boundary3, Boundary4 } from './boundary'
 
 const cursor = createRef<Mesh>()
 const GROUP_COLLIDE = 2 ** 0
 const GROUP_CURSOR = 2 ** 1
 
-export function Table() {
-  const gltf = useLoader(GLTFLoader,'./assets/woodtable6.glb');
-  gltf.scene.traverse(function (child) {
-    console.log(child);
-  });
-
-  useEffect(() => {
-    gltf.scene.scale.set(1, 1, 1);
-    gltf.scene.position.set(0, -3.5, 0);
-    gltf.scene.traverse((object) => {
-      if (object instanceof Mesh) {
-        object.material.envMapIntensity = 20;
-      }
-    });
-  }, [gltf]);
-
-  return (
-      <primitive object={gltf.scene} />
-  );
-}
-
-// Returns legacy geometry vertices, faces for ConvP
-function toConvexProps(bufferGeometry: BufferGeometry): ConvexPolyhedronProps['args'] {
-  const geo = new Geometry().fromBufferGeometry(bufferGeometry)
-  // Merge duplicate vertices resulting from glTF export.
-  // Cannon assumes contiguous, closed meshes to work
-  geo.mergeVertices()
-  return [geo.vertices.map((v) => [v.x, v.y, v.z]), geo.faces.map((f) => [f.a, f.b, f.c]), []]
-}
-
-type DiamondGLTF = GLTF & {
-    nodes: { Cylinder: Mesh }
+type BowlGLTF = GLTF & {
   materials: {}
+  nodes: {
+    bowl: Mesh & {
+      geometry: BufferGeometry & { index: ArrayLike<number> }
+    }
+  }
 }
 
-function Diamond({ position, rotation }: ConvexPolyhedronProps) {
-  console.log('hello1')
-  //const geometry = new THREE.BufferGeometry()
-  const { nodes: { Cylinder: { geometry }, }, } = useLoader(GLTFLoader,'./assets/woodtable6.glb') as DiamondGLTF;
-  console.log('hello')
-  const args = useMemo(() => toConvexProps(geometry), [geometry])
-  const [ref] = useConvexPolyhedron(() => ({ args, mass: 100, position, rotation }), useRef<Mesh>(null))
+const Bowl = forwardRef<Mesh, TrimeshProps>((props, fwdRef) => {
+  const {
+    nodes: {
+      bowl: { geometry },
+    },
+  } = useGLTF('./assets/bowl.glb') as BowlGLTF
+  const {
+    attributes: {
+      position: { array: vertices },
+      
+    },
+    index: { array: indices },
+  } = geometry
+
+  const [bowlref] = useTrimesh(() => ({
+      collisionFilterGroup: GROUP_COLLIDE, 
+      collisionFilterMask: GROUP_COLLIDE,
+      type: 'Dynamic',
+      args: [vertices, indices],
+      mass: 1,
+    }), fwdRef
+    // useRef<Mesh>(null),
+  )
+
   return (
-    <mesh castShadow receiveShadow {...{ geometry, position, ref, rotation }}>
-      <meshStandardMaterial wireframe color="white" />
+    <mesh
+      ref={bowlref}
+      geometry={geometry}
+      args={[geometry]}
+    >
+      <meshStandardMaterial color={'white'} />
     </mesh>
   )
-}
+})
 
 function useDragConstraint(child: RefObject<Object3D>) {
   const [, , api] = usePointToPointConstraint(cursor, child, { pivotA: [0, 0, 0], pivotB: [0, 0, 0], maxForce: 0.7 })
@@ -106,7 +78,7 @@ function useDragConstraint(child: RefObject<Object3D>) {
 
 const Cursor = () => {
   const [cursorref, api] = useSphere(() => (
-    { args: [0.01], 
+    { args: [0.1], 
       collisionFilterGroup: GROUP_CURSOR, 
       collisionFilterMask: GROUP_CURSOR,
       position: [0, 0, 10000], 
@@ -124,15 +96,16 @@ const Cursor = () => {
 
   return (
     <mesh ref={cursorref}>
-      <sphereGeometry args={[0.5, 32, 32]} />
-      <meshBasicMaterial fog={false} depthTest={false} transparent opacity={0.5} />
+      <sphereGeometry args={[0.1]} />
+      <meshBasicMaterial fog={false} depthTest={false} transparent opacity={0.5} color='Black' />
     </mesh>
   )
 }
 
 const Plane = forwardRef<Mesh, PlaneProps>((props, fwdRef) => {
   const [planeref] = usePlane(() => (
-    { collisionFilterGroup: GROUP_COLLIDE,
+    { 
+      collisionFilterGroup: GROUP_COLLIDE,
       collisionFilterMask: GROUP_COLLIDE,
       rotation: [-Math.PI / 2, 0, 0],
      ...props 
@@ -141,7 +114,8 @@ const Plane = forwardRef<Mesh, PlaneProps>((props, fwdRef) => {
   return (
     <mesh ref={planeref} receiveShadow>
       <planeGeometry args={[1000, 1000]} />
-      <shadowMaterial color="#171717" transparent opacity={0.4} />
+      {/*<shadowMaterial color="#171717" />*/}
+      <meshStandardMaterial />
     </mesh>
   )
 })
@@ -155,13 +129,13 @@ const style = {
   top: 20,
 } as const
 
-const Dev_camera_Helper = () => {
+const MY_CAMERA_HELPER = () => {
   const camerad = useRef<any>()
   useHelper(camerad, THREE.CameraHelper)
   return (
     <>
-      <ambientLight intensity={1} />
-      <PerspectiveCamera ref={camerad} near={1} far={4} position={[0, 0, 0]} rotation={[Math.PI*1.5, 0, 0]}></PerspectiveCamera>
+      {/* <ambientLight intensity={1} /> */}
+      <PerspectiveCamera ref={camerad} near={1} far={12} position={[0, 10, 0]} rotation={[Math.PI*1.5, 0, 0]}></PerspectiveCamera>
       <mesh>
         <boxGeometry />
         <meshBasicMaterial color="red" />
@@ -171,87 +145,114 @@ const Dev_camera_Helper = () => {
 }
 
 const PhyBox = forwardRef<Mesh, BoxProps>((props, fwdRef) => {
-//function PhyBox(props:any) {
   const [boxref, api] = useBox(() => (
     { args: [1, 1, 1], 
       collisionFilterGroup: GROUP_COLLIDE, 
       collisionFilterMask: GROUP_COLLIDE,
-      mass: 1, 
+      mass: 1.5, 
       ...props 
     }), fwdRef);
   const bind = useDragConstraint(boxref)
 
   return (
-    <Box
+    <Box receiveShadow castShadow
       args={[1, 1, 1]}
       ref={boxref}
       {...bind}
-      /*onClick={(event:any) => {
-        //get normal, reverse direction
-        const normal = event.face.normal.negate().multiplyScalar(3).toArray();
-        normal[1] = normal[1]*0
-        console.log(normal)
-        api.applyLocalImpulse(normal, [0, 0, 0]); //apply directional force to center
-      }}*/
     >
-      <meshNormalMaterial />
+      <meshBasicMaterial attach="material-0" color="#00FF00" />
+      <meshBasicMaterial attach="material-1" color="#FF0000" />
+      <meshBasicMaterial attach="material-2" color="#0000FF" />
+      <meshBasicMaterial attach="material-3" color="#FFFF00" />
+      <meshBasicMaterial attach="material-4" color="#FF00FF" />
+      <meshBasicMaterial attach="material-5" color="#00FFFF" />
     </Box>
   );
 })
 
-//const Ball = forwardRef<Mesh, SphereProps>((props, fwdRef) => {
-//  
-//  const [ballref, api ] = useSphere(() => (
-//    { args: [0.5], 
-//      mass: 1, 
-//      type: 'Dynamic', 
-//      ...props 
-//    }), fwdRef)
-//
-//  return (
-//    <mesh 
-//      receiveShadow 
-//      castShadow 
-//      ref={ballref}
-//          onClick={(event:any) => {
-//        //get normal, reverse direction
-//        const normal = event.face.normal.negate().multiplyScalar(3).toArray();
-//        normal[1] = normal[1]*0
-//        //console.log(normal)
-//        console.log(event.face)
-//        api.applyImpulse(normal, [0, 0, 0]);
-//      }}
-//      >
-//      <sphereGeometry args={[0.5, 64, 64]} />
-//      <meshNormalMaterial />
-//    </mesh>
-//  )
-//})
+const PhySphere = forwardRef<Mesh, SphereProps>((props, fwdRef) => {
+  const [sphereref, api] = useSphere(() => (
+    { args: [0.5], 
+      collisionFilterGroup: GROUP_COLLIDE, 
+      collisionFilterMask: GROUP_COLLIDE,
+      mass: 1, 
+      ...props 
+    }), fwdRef);
+  const bind = useDragConstraint(sphereref)
+
+  return (
+    <Sphere receiveShadow castShadow
+      args={[0.5]}
+      ref={sphereref}
+      {...bind}
+      
+    >
+    <meshStandardMaterial color="049ef4" metalness={1} emissive="963c3c"/>
+    </Sphere>
+  );
+})
+
+// type BoundaryProps = BoxProps & {
+//   color?: string
+// }
+
+// type BoundaryProps = BoxProps & Pick<MeshStandardMaterialProps, 'color'>
+
+// const Boundary = forwardRef<Mesh, BoundaryProps>((props, fwdRef) => {
+//     const [boundaryref] = useBox(() => (
+//       { 
+//         args: [15, 0.01, 20],
+//         collisionFilterGroup: GROUP_COLLIDE, 
+//         collisionFilterMask: GROUP_COLLIDE,
+//         type: 'Dynamic',
+//         // color: 'Blue',
+//         ...props 
+//       }), fwdRef);
+  
+//     return (
+//       <Box receiveShadow castShadow
+//         args={[15, 0.01, 20]}
+//         ref={boundaryref}
+//       >
+//         <meshStandardMaterial />
+//       </Box>
+//     );
+//   })
 
 function App() {
 
   return (
     <>
-      <Canvas shadows dpr={[1, 2]} gl={{ alpha: false }} /*camera={{ rotation: [0,90,90], position: [-10, 5, 5], fov: 45 }}*/>
+      <Canvas shadows dpr={[1, 2]} gl={{ alpha: false }}>
         <color attach="background" args={['lightblue']} />
         <PerspectiveCamera makeDefault rotation={[Math.PI*1.5, 0, 0]} position={[0,10,0]} />
-        <OrbitControls />
-        <Dev_camera_Helper />
-        <ambientLight />
-        <directionalLight position={[100, 100, 100]} castShadow shadow-mapSize={[2048, 2048]} />
-        <Physics>
-          <Debug color="black" scale={1.1}>
+        {/* <OrbitControls />
+        <MY_CAMERA_HELPER /> */}
+        {/* <ambientLight /> */}
+        <spotLight 
+          position={[-2, 10, -2]} 
+          castShadow 
+          shadow-mapSize={[2048, 2048]} />
+        <Physics gravity = {[0, -11, 0]}>
+          {/* <Debug color="black" scale={1.1}> */}
+            {/*right*/}
+            <Boundary1 position={[6,-2,0]} rotation={[0,0,Math.PI*1.4]} />
+            {/*left*/}
+            <Boundary2 position={[-6,-2,0]} rotation={[0,0,Math.PI*-1.4]} />
+            {/*top*/}
+            <Boundary3 position={[0,-2,-4]} rotation={[0,Math.PI*1.5,Math.PI*-1.4]} />
+            {/*bottom*/}
+            <Boundary4 position={[0,-2,4]} rotation={[0,Math.PI*1.5,Math.PI*1.4]} />
             <Plane position={[0, -2.5, 0]} />
-            {/*<Ball position={[0.1, 5, 0]} />*/}
+            {/* <PhySphere position={[2, 5, 0]} /> */}
             <PhyBox position={[0.1, 4, 0]} />
+            {/* <Bowl args={[geometry]}/> */}
             <Cursor />
-            <Diamond />
-            <Table />
-          </Debug>
+          {/* </Debug> */}
         </Physics>
       </Canvas>
       <div style={style}>
-        <pre>* click to tighten constraint</pre>
+        <pre>* Grab the cube with the mouse!</pre>
       </div>
     </>
   )
