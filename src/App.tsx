@@ -12,6 +12,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Geometry } from "three-stdlib/deprecated/Geometry";
 import type { GLTF } from 'three-stdlib/loaders/GLTFLoader'
 import { Boundary1, Boundary2, Boundary3, Boundary4 } from './boundary'
+import { useMediaQuery } from 'usehooks-ts'
 
 const cursor = createRef<Mesh>()
 const GROUP_COLLIDE = 2 ** 0
@@ -145,8 +146,10 @@ const MY_CAMERA_HELPER = () => {
 }
 
 const PhyBox = forwardRef<Mesh, BoxProps>((props, fwdRef) => {
+  const isMobile = IsMobile()
   const [boxref, api] = useBox(() => (
-    { args: [1, 1, 1], 
+    {  
+      args: [isMobile ? 0.5:1, isMobile ? 0.5:1, isMobile ? 0.5:1],
       collisionFilterGroup: GROUP_COLLIDE, 
       collisionFilterMask: GROUP_COLLIDE,
       mass: 1.5, 
@@ -156,7 +159,7 @@ const PhyBox = forwardRef<Mesh, BoxProps>((props, fwdRef) => {
 
   return (
     <Box receiveShadow castShadow
-      args={[1, 1, 1]}
+      args={[IsMobile() ? 0.5:1, IsMobile() ? 0.5:1, IsMobile() ? 0.5:1]}
       ref={boxref}
       {...bind}
     >
@@ -218,14 +221,18 @@ const PhySphere = forwardRef<Mesh, SphereProps>((props, fwdRef) => {
 //       </Box>
 //     );
 //   })
+function IsMobile() {
+  const isMobile = useMediaQuery('(max-width: 1500px)')
+  return isMobile
+}
 
 function App() {
 
   return (
     <>
-      <Canvas shadows dpr={[1, 2]} gl={{ alpha: false }}>
+      <Canvas shadows dpr={[1, 2]} gl={{ alpha: false }} >
         <color attach="background" args={['lightblue']} />
-        <PerspectiveCamera makeDefault rotation={[Math.PI*1.5, 0, 0]} position={[0,10,0]} />
+        <PerspectiveCamera makeDefault rotation={[Math.PI*1.5, 0, 0]} position={[0,10,0]} aspect={9}/>
         {/* <OrbitControls />
         <MY_CAMERA_HELPER /> */}
         {/* <ambientLight /> */}
@@ -236,9 +243,9 @@ function App() {
         <Physics gravity = {[0, -11, 0]}>
           {/* <Debug color="black" scale={1.1}> */}
             {/*right*/}
-            <Boundary1 position={[6,-2,0]} rotation={[0,0,Math.PI*1.4]} />
+            <Boundary1 position={[IsMobile() ? 2:6,-2,0]} rotation={[0,0,Math.PI*1.4]} />
             {/*left*/}
-            <Boundary2 position={[-6,-2,0]} rotation={[0,0,Math.PI*-1.4]} />
+            <Boundary2 position={[IsMobile() ? -2:-6,-2,0]} rotation={[0,0,Math.PI*-1.4]} />
             {/*top*/}
             <Boundary3 position={[0,-2,-4]} rotation={[0,Math.PI*1.5,Math.PI*-1.4]} />
             {/*bottom*/}
