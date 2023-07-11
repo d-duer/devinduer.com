@@ -53,7 +53,7 @@ function App() {
           </div>
           <div>
             <div style={linksChildrenStyle}>
-              <a href="https://github.com/d-duer" target="_blank" rel="noreferrer">
+              <a href="https://github.com/d-duer/devinduer.com" target="_blank" rel="noreferrer">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Github Logo" />
               </a>
             </div>
