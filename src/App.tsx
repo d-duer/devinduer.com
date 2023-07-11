@@ -7,9 +7,11 @@ import { Plane } from './Plane'
 import { Cursor } from './CursorStuff'
 //import { MY_CAMERA_HELPER } from './CameraHelper'
 import { PhyBox } from './Phybox'
-import { instructionsStyle, linksChildrenStyle, linksParentStyle } from './Styles'
+import { instructionsStyleMobile, instructionsStyleDesktop, linksChildrenStyleDesktop, linksChildrenStyleMobile, linksParentStyleDesktop, linksParentStyleMobile, instructionsTextStyleMobile, instructionsTextStyleDesktop } from './Styles'
+import { IsMobile } from './Ismobile'
 
 function App() {
+  const isMobile = IsMobile()
 
   return (
     <>
@@ -41,18 +43,18 @@ function App() {
           {/*</Debug>*/}
         </Physics>
       </Canvas>
-        <div style={instructionsStyle}>
-          <pre>* Grab the cube!</pre>
-          <pre>  Throw it around!</pre>
+        <div style={isMobile ? instructionsStyleMobile:instructionsStyleDesktop}>
+          <pre style={isMobile ? instructionsTextStyleMobile:instructionsTextStyleDesktop}>* Grab the cube!</pre>
+          <pre style={isMobile ? instructionsTextStyleMobile:instructionsTextStyleDesktop}>  Throw it around!</pre>
         </div>
-        <div style={linksParentStyle}>
-          <div style={linksChildrenStyle}>
+        <div style={isMobile ? linksParentStyleMobile:linksParentStyleDesktop}>
+          <div style={isMobile ? linksChildrenStyleMobile:linksChildrenStyleDesktop}>
             <a href="https://www.linkedin.com/in/devinduer/" target="_blank" rel="noreferrer">
               <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="Linkedin Logo" />
             </a>
           </div>
           <div>
-            <div style={linksChildrenStyle}>
+            <div style={isMobile ? linksChildrenStyleMobile:linksChildrenStyleDesktop}>
               <a href="https://github.com/d-duer/devinduer.com" target="_blank" rel="noreferrer">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Github Logo" />
               </a>
