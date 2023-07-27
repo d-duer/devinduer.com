@@ -15,6 +15,7 @@ function App() {
 
   return (
     <>
+      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></meta>
       <Canvas shadows dpr={[1, 2]} gl={{ alpha: false }} >
         <color attach="background" args={['lightblue']} />
         <PerspectiveCamera makeDefault rotation={[Math.PI*1.5, 0, 0]} position={[0,10,0]} aspect={9}/>
