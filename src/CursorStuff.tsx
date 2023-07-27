@@ -1,21 +1,11 @@
-import type { BoxProps, PlaneProps, SphereProps, Triplet, ConvexPolyhedronProps, TrimeshProps } from '@react-three/cannon'
-import { Physics, useBox, useSphere, useSpring, usePlane, Debug, usePointToPointConstraint, useConvexPolyhedron, useTrimesh } from '@react-three/cannon'
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
-import React, { forwardRef, useEffect, useRef, useState, createRef, useCallback, useMemo, useLayoutEffect } from 'react'
-import type { CSSProperties, RefObject } from 'react'
-import type { ThreeEvent, MeshStandardMaterialProps, MeshProps, BoxBufferGeometryProps } from '@react-three/fiber'
-import { CameraHelper, Mesh, type Object3D } from 'three'
-import type { BufferGeometry } from 'three'
-import { Box, Sphere, OrbitControls, PerspectiveCamera, useHelper, useGLTF, Html } from '@react-three/drei'
-import * as THREE from "three"
-import { Boundary1, Boundary2, Boundary3, Boundary4 } from './boundary'
-import { useMediaQuery } from 'usehooks-ts'
-import backgroundDesktop from './backgroundDesktop.png'
-import backgroundMobile from './backgroundMobile.png'
-import george from './george512border.jpg'
+import { useSphere, usePointToPointConstraint } from '@react-three/cannon'
+import { useFrame } from '@react-three/fiber'
+import { useEffect, createRef, useCallback } from 'react'
+import type { RefObject } from 'react'
+import type { ThreeEvent } from '@react-three/fiber'
+import { Mesh, type Object3D } from 'three'
 import './App.css';
-import {GROUP_COLLIDE, GROUP_CURSOR} from './collisionGroups'
-import {Plane} from './Plane'
+import {GROUP_CURSOR} from './collisionGroups'
 
 const cursor = createRef<Mesh>()
 
