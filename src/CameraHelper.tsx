@@ -3,6 +3,7 @@ import { PerspectiveCamera, useHelper } from "@react-three/drei";
 import * as THREE from "three";
 
 export const MY_CAMERA_HELPER = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const camerad = useRef<any>();
   useHelper(camerad, THREE.CameraHelper);
   return (

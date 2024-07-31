@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React from "react";
 import type { PlaneProps } from "@react-three/cannon";
 import { usePlane } from "@react-three/cannon";
@@ -5,7 +6,6 @@ import { useLoader } from "@react-three/fiber";
 import { forwardRef } from "react";
 import { Mesh } from "three";
 import * as THREE from "three";
-
 import backgroundDesktop from "./assets/backgroundDesktop.png";
 import backgroundMobile from "./assets/backgroundMobile.png";
 import "./App.css";
@@ -32,8 +32,6 @@ export const Plane = forwardRef<Mesh, PlaneProps>((props, fwdRef) => {
 
   return (
     <mesh ref={planeref} receiveShadow>
-      {/*<planeGeometry args={[11.8,7.8]} />*/}
-
       <planeGeometry args={[isMobile ? 3.69 : 11.8, isMobile ? 7.74 : 7.8]} />
       <meshStandardMaterial map={backgroundImage} />
     </mesh>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React from "react";
 import type { BoxProps } from "@react-three/cannon";
 import { Physics, useBox } from "@react-three/cannon";

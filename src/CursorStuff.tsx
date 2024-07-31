@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React from "react";
 import { useSphere, usePointToPointConstraint } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
