@@ -3,7 +3,7 @@
   cursor: none;
   min-width: 0;
   min-height: 0;
-  overflow: hidden
+  overflow: hidden;
 }
 
 html,
@@ -27,6 +27,18 @@ body {
   position: fixed;
   overflow: hidden;
   overscroll-behavior-y: none;
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    helvetica neue,
+    helvetica,
+    ubuntu,
+    roboto,
+    noto,
+    segoe ui,
+    arial,
+    sans-serif;
   color: rgb(180, 16, 16);
 }
