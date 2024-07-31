@@ -44,11 +44,17 @@
     ]
   },
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
     "@types/aria-query": "^5.0.1",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
     "@types/react": "^18.2.13",
     "@types/react-dom": "^18.2.6",
-    "@types/three": "^0.152.1"
+    "@types/three": "^0.152.1",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.8.0",
+    "prettier": "3.3.3",
+    "typescript-eslint": "^7.18.0"
   }
 }
