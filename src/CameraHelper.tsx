@@ -14,7 +14,7 @@ export const MY_CAMERA_HELPER = () => {
         near={1}
         far={12}
         position={[0, 10, 0]}
-        rotation={[Math.PI * 1.5, 0, 0]}
+        rotation={[Math.PI * 1.5, 90, 0]}
       ></PerspectiveCamera>
       <mesh>
         <boxGeometry />

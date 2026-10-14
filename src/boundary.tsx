@@ -96,27 +96,3 @@ export const Boundary3 = forwardRef<Mesh, BoundaryProps>((props, fwdRef) => {
     </Box>
   );
 });
-
-export const Boundary4 = forwardRef<Mesh, BoundaryProps>((props, fwdRef) => {
-  const [boundaryref] = useBox(
-    () => ({
-      args: [100, 0.0000000000001, 20],
-      collisionFilterGroup: GROUP_COLLIDE,
-      collisionFilterMask: GROUP_COLLIDE,
-      type: "Dynamic",
-      ...props,
-    }),
-    fwdRef,
-  );
-
-  return (
-    <Box
-      receiveShadow
-      castShadow
-      args={[100, 0.0000000000001, 20]}
-      ref={boundaryref}
-    >
-      <meshStandardMaterial color="#FFFF00" />
-    </Box>
-  );
-});

@@ -34,3 +34,21 @@ a:hover {
 
 a:active {
 }
+
+/* index.css hides the cursor everywhere so the 3d sphere can stand in for it;
+   bring the real one back over the on-screen controls so you can see what you
+   click */
+.wind-controls,
+.wind-controls *,
+.tool-picker,
+.tool-picker * {
+  cursor: default;
+}
+
+.tool-picker button {
+  cursor: pointer;
+}
+
+.wind-controls input[type="range"] {
+  cursor: pointer;
+}

@@ -5,11 +5,14 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, createRef, useCallback } from "react";
 import type { RefObject } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
-import { Mesh, type Object3D } from "three";
+import { Mesh, Plane, Vector3, type Object3D } from "three";
 import "./App.css";
 import { GROUP_CURSOR } from "./collisionGroups";
 
 const cursor = createRef<Mesh>();
+// the cursor slides along this vertical plane through the middle of the arena
+const cursorPlane = new Plane(new Vector3(0, 0, 1), 0);
+const cursorPoint = new Vector3();
 
 export const Cursor = () => {
   const [cursorref, api] = useSphere(
@@ -23,13 +26,12 @@ export const Cursor = () => {
     cursor,
   );
 
-  useFrame(({ mouse, viewport: { height, width } }) => {
-    //x is left right, z is top bottom, y is towards and away from screen
-    const x = mouse.x;
-    const y = 0.1;
-    const z = -mouse.y;
-    //api.position.set(x*9.2, y, z*4.7)
-    api.position.set((x * width) / 2, y, (z * height) / 2);
+  useFrame(({ mouse, camera, raycaster }) => {
+    // project the mouse from the camera onto the cursor plane
+    raycaster.setFromCamera(mouse, camera);
+    if (raycaster.ray.intersectPlane(cursorPlane, cursorPoint)) {
+      api.position.set(cursorPoint.x, cursorPoint.y, cursorPoint.z);
+    }
   });
 
   return (
